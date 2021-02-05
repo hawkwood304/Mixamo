@@ -206,6 +206,24 @@ class MixamoUI(QtWidgets.QDialog):
         if not os.path.exists(self.directory):
             os.mkdir(self.directory)
 
+    @staticmethod
+    def clean_namespace():
+        """
+
+        Returns: Clean all the namespace we have in scene and merge it all to root
+
+        """
+        cm.namespace(set=':')
+        namespaces = cm.namespaceInfo(listOnlyNamespaces=True)
+        namespacesMerged = 0
+        for name in namespaces:
+            if name == "UI":
+                continue
+            if name == "shared":
+                continue
+            cm.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
+            namespacesMerged += 1
+
     def executed(self):
         # Create and check
         self.create_directory()
@@ -224,6 +242,8 @@ class MixamoUI(QtWidgets.QDialog):
 
             # Import fbx file into scene with out namespace
             cm.file(new_path, i=True, mergeNamespacesOnClash=True, namespace=':')
+
+            self.clean_namespace()
 
             # Get list joint under world
             list_joints = self.check_parent()
